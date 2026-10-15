@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f1117" />
+  <meta name="description" content="Fake Artist - a free browser party game. One player doesn't know the word. Find the impostor." />
+  <title>Fake Artist — party game</title>
+  <link rel="manifest" href="/games/fake-artist/manifest.webmanifest" />
+  <link rel="icon" href="/games/fake-artist/favicon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/games/fake-artist/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Fake Artist" />
+  <link rel="stylesheet" href="/games/fake-artist/style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <header id="topbar" class="hidden">
+      <div class="brand">
+        <a class="hubLink" href="/" title="All games" aria-label="Back to all games">‹</a>
+        <span class="dotstatus" id="statusDot" title="Connected"></span>
+        <span class="brandname">🎭 Fake Artist</span>
+        <span class="roundChip hidden" id="roundChip"></span>
+      </div>
+      <div class="topRight">
+        <button id="soundBtn" class="iconbtn" title="Sound on / off" aria-label="Toggle sound">🔊</button>
+        <button id="menuBtn" class="iconbtn" title="Settings &amp; rules" aria-label="Settings and rules">⚙️</button>
+        <button id="leaveBtn" class="iconbtn" title="Leave room" aria-label="Leave room">🚪</button>
+        <div class="code-chip" id="codeChip" title="Room code">----</div>
+      </div>
+    </header>
+
+    <!-- ============================= HOME ============================= -->
+    <section id="scr-home" class="screen">
+      <h1 class="logo">🎭<br />Fake Artist</h1>
+      <p class="tag">One player doesn't know the word. Everyone else does. Draw one line each — then find the impostor.</p>
+
+      <label class="field">
+        <span>Your name</span>
+        <input id="nameInput" maxlength="16" placeholder="e.g. Sam" autocomplete="off" />
+      </label>
+
+      <button id="createBtn" class="btn primary big">Create a room</button>
+
+      <details class="adv card" id="homeAdv">
+        <summary>⚙️ Customize your room</summary>
+        <div id="homeSettings" class="settingsHost"></div>
+      </details>
+
+      <div class="or">or</div>
+
+      <label class="field">
+        <span>Room code</span>
+        <input id="codeInput" maxlength="4" placeholder="ABCD" autocapitalize="characters" autocomplete="off" />
+      </label>
+      <button id="joinBtn" class="btn big">Join room</button>
+
+      <button id="homeRules" class="btn tiny ghost center">How to play</button>
+
+      <p id="homeErr" class="err"></p>
+      <p class="fine">Free · no signup · works on phone &amp; PC · installable</p>
+    </section>
+
+    <!-- ============================ LOBBY ============================= -->
+    <section id="scr-lobby" class="screen hidden">
+      <h2>Lobby <span class="muted" id="lobbyCount"></span></h2>
+
+      <div class="invite card">
+        <div class="muted">Invite code</div>
+        <div class="bigcode" id="lobbyCode">----</div>
+        <button id="shareBtn" class="btn small">Copy invite link</button>
+      </div>
+
+      <ul id="lobbyPlayers" class="players"></ul>
+
+      <div id="lobbyLeaderboard" class="card hidden">
+        <div class="row-between"><b>🏆 Running leaderboard</b>
+          <button id="resetBtn" class="btn tiny hidden">Reset</button>
+        </div>
+        <ul id="lobbyScores" class="players compact"></ul>
+      </div>
+
+      <div id="hostControls" class="card hidden">
+        <b>Room settings</b>
+        <div id="lobbySettings" class="settingsHost"></div>
+        <p id="settingsSummary" class="muted tiny"></p>
+        <button id="startBtn" class="btn primary big">Start game</button>
+        <button id="disbandBtn" class="btn danger small full">Disband room</button>
+      </div>
+
+      <p id="lobbyMsg" class="muted"></p>
+    </section>
+
+    <!-- ============================= PLAY ============================= -->
+    <section id="scr-play" class="screen hidden">
+      <div id="roleBanner" class="banner"></div>
+      <div class="hud">
+        <span id="turnText"></span>
+        <span class="muted tiny" id="progressText"></span>
+        <span class="timer" id="timerText"></span>
+      </div>
+      <div class="canvasWrap">
+        <canvas id="board"></canvas>
+      </div>
+      <button id="doneBtn" class="btn primary big hidden">Done — pass on</button>
+      <ul id="playPlayers" class="players compact"></ul>
+    </section>
+
+    <!-- ============================= VOTE ============================= -->
+    <section id="scr-vote" class="screen hidden">
+      <div class="hud">
+        <h2>Who is the Fake?</h2>
+        <span class="timer" id="voteTimerText"></span>
+      </div>
+      <p class="muted" id="voteHint"></p>
+      <ul id="voteList" class="players vote"></ul>
+      <p id="voteMsg" class="muted"></p>
+    </section>
+
+    <!-- ============================ GUESS ============================= -->
+    <section id="scr-guess" class="screen hidden">
+      <div class="hud">
+        <h2 id="guessTitle">Caught!</h2>
+        <span class="timer" id="guessTimerText"></span>
+      </div>
+      <div id="guessBox" class="hidden">
+        <p class="muted">Steal the win — what was the word?</p>
+        <input id="guessInput" maxlength="40" placeholder="type the word…" autocomplete="off" />
+        <button id="guessBtn" class="btn primary big">Submit guess</button>
+      </div>
+      <p id="guessWait" class="muted hidden"></p>
+    </section>
+
+    <!-- ============================ REVEAL ============================ -->
+    <section id="scr-reveal" class="screen hidden">
+      <div id="revealBanner" class="banner"></div>
+      <div id="wordReveal" class="wordReveal"></div>
+
+      <div class="canvasWrap reveal">
+        <canvas id="revealCanvas"></canvas>
+      </div>
+
+      <div id="finalCard" class="card hidden">
+        <div class="row-between">
+          <b>🏆 Final results</b>
+          <button id="resetScoresBtn" class="btn tiny hidden">Reset scores</button>
+        </div>
+        <ul id="finalList" class="players compact"></ul>
+        <div id="hostFinal" class="hidden">
+          <button id="playAgainBtn" class="btn primary big">🔁 Play again (keeps scores)</button>
+          <button id="toLobbyBtn" class="btn small full">Back to lobby</button>
+        </div>
+        <p id="finalWait" class="muted hidden">Waiting for the host…</p>
+      </div>
+
+      <div id="midCard" class="card hidden">
+        <div class="row-between"><b>🏆 Running leaderboard</b></div>
+        <ul id="scoreList" class="players compact"></ul>
+
+        <div id="hostReveal" class="hidden">
+          <button id="nextBtn" class="btn primary big">▶ Next round</button>
+          <details class="adv" id="revealAdv">
+            <summary>⚙️ Change category &amp; words for the next round</summary>
+            <div id="revealSettings" class="settingsHost"></div>
+          </details>
+          <button id="toLobbyBtn2" class="btn small full">Back to lobby</button>
+        </div>
+        <p id="againWait" class="muted hidden">Waiting for the host to start the next round…</p>
+      </div>
+    </section>
+
+    <!-- reaction bar (in-game screens only) -->
+    <div id="reactionBar" class="reactionBar hidden" aria-label="Send a reaction"></div>
+
+  </div>
+
+  <!-- floating reactions -->
+  <div id="floaters" class="floaters"></div>
+  <div id="confetti" class="confetti"></div>
+
+  <!-- settings / rules modal -->
+  <div id="menuModal" class="modal hidden">
+    <div class="modalCard">
+      <div class="row-between"><b>Settings &amp; rules</b><button id="menuClose" class="iconbtn" aria-label="Close">✕</button></div>
+
+      <div class="setting-row">
+        <span>Sound</span>
+        <button id="modalSoundToggle" class="btn tiny">On</button>
+      </div>
+      <div class="setting-row">
+        <span>Volume</span>
+        <input id="volumeSlider" type="range" min="0" max="100" value="70" />
+      </div>
+      <div class="setting-row">
+        <span>Reduce motion</span>
+        <button id="motionToggle" class="btn tiny">Off</button>
+      </div>
+
+      <div class="setting-row" id="installRow" style="display:none">
+        <span>Install app</span>
+        <button id="installBtn" class="btn tiny">Install</button>
+      </div>
+
+      <hr />
+      <div class="rules">
+        <b>How to play</b>
+        <ol>
+          <li>One player is secretly the <b>Fake</b> — they get only the category, not the word.</li>
+          <li>Players take turns adding <b>one line each</b> to the shared drawing.</li>
+          <li>Everyone votes for who they think is faking it.</li>
+          <li>If the Fake is caught, they get one guess at the word.</li>
+        </ol>
+        <b>Rounds</b>
+        <p>Play as many rounds as you like (set in room settings). Each round brings a
+           <b>new word</b>, a <b>new category</b> and — by default — a <b>new Fake</b>, so
+           nobody can coast on one lucky role.</p>
+        <b>Scoring</b>
+        <ul>
+          <li>Fake caught + wrong guess → every artist <b>+1</b></li>
+          <li>Fake caught + right guess → Fake <b>+2</b></li>
+          <li>Fake escapes → each Fake <b>+2</b></li>
+        </ul>
+        <p class="muted tiny">Tap an emoji at the bottom any time to react. Works best with 3–10 players on their own phones.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/games/fake-artist/app.js"></script>
+</body>
+</html>

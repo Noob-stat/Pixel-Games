@@ -1,0 +1,35 @@
+{
+  "_help": "Add a game by copying an entry below. `url` is where the game's index.html lives (e.g. /games/my-game/). `status` is 'live' or 'soon'. Nothing else needs changing - the hub reads this file.",
+  "title": "Pixel Games",
+  "tagline": "Free browser party games. No signup, no install — everyone plays on their own phone.",
+  "games": [
+    {
+      "id": "fake-artist",
+      "title": "Fake Artist",
+      "emoji": "🎭",
+      "tagline": "One player doesn't know the word.",
+      "status": "live",
+      "url": "/games/fake-artist/",
+      "players": "3–10 players",
+      "time": "10–20 min",
+      "device": "Phone or PC",
+      "tags": ["Drawing", "Bluffing", "Realtime"],
+      "gradient": ["#6c8cff", "#b06cff"],
+      "description": "Everyone gets the secret word — except one player, the Fake. Take turns adding a single line to the shared drawing, then vote for whoever you think is bluffing. Get it right and the Fake gets one desperate guess to steal the win.",
+      "howToPlay": [
+        "Create a room and share the 4-letter code (or the invite link).",
+        "Everyone draws one line in turn. The Fake only knows the category.",
+        "Vote for who you think is faking it.",
+        "If the Fake is caught, they get one guess at the word to steal the round."
+      ],
+      "features": [
+        "Up to 10 players on their own devices",
+        "1–2 Fakes, 1–10 rounds, timers for turns and votes",
+        "Custom word lists and categories",
+        "Emoji reactions, sound, confetti",
+        "Rematch keeps the running leaderboard",
+        "Installable app (works offline)"
+      ]
+    }
+  ]
+}
